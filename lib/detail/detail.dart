@@ -1,11 +1,12 @@
 import 'package:flutter/material.dart';
-import 'package:space_x_new/items/upcoming.dart';
+// import 'package:space_x_new/items/upcoming.dart';
 import 'package:intl/intl.dart';
+import 'package:space_x_new/items/spacex_launch.dart';
 
 class DetailPage extends StatefulWidget {
-  DetailPage({Key key, @required this.upcoming}) : super(key: key);
+  DetailPage({Key key, @required this.spaceXLaunch}) : super(key: key);
 
-  final Upcoming upcoming;
+  final SpaceXLaunch spaceXLaunch;
 
   @override
   State<StatefulWidget> createState() {
@@ -23,12 +24,14 @@ class _DetailState extends State<DetailPage> {
   void initState() {
     super.initState();
 
-    if (widget.upcoming.dateLocal!= null){
-      var dateLaunch = DateTime.parse(widget.upcoming.dateLocal).toLocal();
+    debugPrint(widget.spaceXLaunch.dateUtc);
+
+    if (widget.spaceXLaunch.dateLocal!= null){
+      var dateLaunch = DateTime.parse(widget.spaceXLaunch.dateLocal).toLocal();
       _dateLaunch = dateFormat.format(dateLaunch) + ' ${dateLaunch.timeZoneName}';
     }
-    if (widget.upcoming.staticFireUtc != null){
-      var staticTest = DateTime.parse(widget.upcoming.staticFireUtc).toLocal();
+    if (widget.spaceXLaunch.staticFire != null){
+      var staticTest = DateTime.parse(widget.spaceXLaunch.staticFire).toLocal();
       _dateStaticFire = dateFormat.format(staticTest) + ' ${staticTest.timeZoneName}';
     }
   }
@@ -41,7 +44,7 @@ class _DetailState extends State<DetailPage> {
         SliverAppBar(
           expandedHeight: 150.0,
           flexibleSpace: FlexibleSpaceBar(
-            title: Text(widget.upcoming.missionName),
+            title: Text(widget.spaceXLaunch.missionName),
             background: Container(
               decoration: BoxDecoration(color: Theme.of(context).primaryColor),
             ),
@@ -78,12 +81,12 @@ class _DetailState extends State<DetailPage> {
           ),
           ListTile(
             contentPadding: EdgeInsets.only(left: 72.0),
-            title: Text(widget.upcoming.rockets.rocketName),
+            title: Text(widget.spaceXLaunch.rockets.rocketName),
             subtitle: Text('rocket name'),
           ),
           ListTile(
             contentPadding: EdgeInsets.only(left: 72.0),
-            title: Text(widget.upcoming.rockets.rocketType),
+            title: Text(widget.spaceXLaunch.rockets.rocketType),
             subtitle: Text('rocket type'),
           )
         ],
@@ -121,6 +124,7 @@ class _DetailState extends State<DetailPage> {
     );
   }
 
+/*
   Widget _horizontalCores(){
     return Container(
       height: 150,
@@ -133,7 +137,7 @@ class _DetailState extends State<DetailPage> {
       ),
     );
   }
-
+  */
   Widget _cardItem(String title){
     return Container(
       width: 160.0,

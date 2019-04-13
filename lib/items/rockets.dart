@@ -14,7 +14,6 @@ class Rockets {
 
   factory Rockets.fromJson(Map<String, dynamic> json){
     final List<dynamic> data = json['first_stage']['cores'];
-    print(data);
 
     return Rockets(
       rocketId: json['rocket_id'],
