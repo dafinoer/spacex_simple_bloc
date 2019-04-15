@@ -1,6 +1,6 @@
 import 'package:rxdart/rxdart.dart';
 import 'package:space_x_new/items/spacex_launch.dart';
-import 'package:space_x_new/services/homeservice.dart';
+import 'package:space_x_new/services/upcoming_service.dart';
 import 'dart:async';
 import 'dart:collection';
 
@@ -8,23 +8,34 @@ import 'dart:collection';
 enum ModeType { upcomingLaunch, allLaunch }
 
 class UpcomingBloc {
-  final HomeServices _services = HomeServices();
+
+  final UpcomingServices _services = UpcomingServices();
 
   final _controllUnmodief =
       BehaviorSubject<UnmodifiableListView<SpaceXLaunch>>();
 
   var datarocket = <SpaceXLaunch>[];
 
-  HashMap<int, List<SpaceXLaunch>> hashMap;
+  HashMap<int, List<SpaceXLaunch>> hashMap = HashMap<int, List<SpaceXLaunch>>();
 
   final modeType = StreamController<ModeType>();
 
+  final isLoadingContoller = StreamController<bool>();
+
+  bool isLoading = false;
+
+  bool fullPage = false;
+
+  int _index = 0;
+
   UpcomingBloc() {
-    //cache datarocket
-    hashMap = HashMap<int, List<SpaceXLaunch>>();
 
     // stream untuk upcoming (default)
-    _getData(0);
+    _getData(_index);
+
+    isLoadingContoller.stream.listen((onData) {
+      isLoading = onData;
+    });
 
     modeType.stream.listen((modeType) {
       /*
@@ -32,14 +43,20 @@ class UpcomingBloc {
       pada method getdata akan mengcheck index dan memanggil network call
       */
       if (ModeType.allLaunch == modeType) {
-        _getData(1);
+        _index = 1;
+        fullPage = false;
+        _getData(_index);
       } else {
-        _getData(0);
+        _index = 0;
+        fullPage = false;
+        _getData(_index);
       }
     });
   }
 
   Sink<ModeType> get modeTypeSink => modeType.sink;
+
+  Sink<bool> get modeIsLoading => isLoadingContoller.sink;
 
   Observable<UnmodifiableListView<SpaceXLaunch>> get fetchDataRest =>
       _controllUnmodief.stream;
@@ -49,37 +66,39 @@ class UpcomingBloc {
       fetchDataRestUpcoming().then((onValue) {
         _controllUnmodief.add(UnmodifiableListView(datarocket));
       });
-    } else {
-      fetchDataRestLaunch().then((onValue) {
-        _controllUnmodief.add(UnmodifiableListView(datarocket));
-      });
     }
   }
+  // for infinte list
+  getInfinite(int index) async {
 
-  Future<List<SpaceXLaunch>> fetchDataRestUpcoming() async {
-    /*
-    konsep key dan value ini akan mencheck key, di sini ketika key 1 ada maka 
+    if (_index == 0) {
+      SpaceXLaunchList spaceXLaunchList = await _services.getRestUpcoming(index);
+      if (spaceXLaunchList.listData.length != 0 && _services.indexData != index) {
+        _services.setOffset(index);
+        hashMap[1].addAll(spaceXLaunchList.listData);
+        datarocket = hashMap[1];
+        _controllUnmodief.add(UnmodifiableListView(datarocket));
+      } else {
+        fullPage = true;
+        _controllUnmodief.add(UnmodifiableListView(datarocket));   
+      }
+    }
+    isLoadingContoller.sink.add(false);
+  }
+
+  /*
+    konsep key dan value ini akan check key, di sini ketika key 1 ada maka
     lanjut akan langsung di initilize ke variable datarocket
     kemudian di return hashmapnya 
      */
+  Future<List<SpaceXLaunch>> fetchDataRestUpcoming() async {
     if (!hashMap.containsKey(1)) {
-      print('get print');
-      SpaceXLaunchList launchRest = await _services.getRestUpcoming();
+      SpaceXLaunchList launchRest = await _services.getRestUpcoming(0);
       hashMap[1] = launchRest.listData;
     }
     datarocket = hashMap[1];
 
     return hashMap[1];
-  }
-
-  Future<List<SpaceXLaunch>> fetchDataRestLaunch() async {
-    if (!hashMap.containsKey(2)) {
-      SpaceXLaunchList launchRest = await _services.getRestLaunch();
-      hashMap[2] = launchRest.listData;
-    }
-    datarocket = hashMap[2];
-
-    return hashMap[2];
   }
 
   void dispose() {
