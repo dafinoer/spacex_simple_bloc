@@ -4,9 +4,7 @@ import 'dart:convert';
 import 'package:space_x_new/utils/constant.dart';
 import 'package:space_x_new/utils/utils.dart';
 
-class UpcomingServices with Constanta implements Query {
-
-  int _offset;
+class UpcomingServices with Constanta{
 
   Future<SpaceXLaunchList> getRestUpcoming(index) async {
     final uri = Uri.https(Constanta.URL, Constanta.UPCOMING, 
@@ -22,17 +20,5 @@ class UpcomingServices with Constanta implements Query {
     } else {
       throw Exception ('error');
     }
-  }
-
-  @override
-  void setLimit(int offset) {
-    // TODO: implement setLimit
-  }
-
-  int get indexData => _offset;
-
-  @override
-  void setOffset(int offset) {
-    _offset = offset;
   }
 }

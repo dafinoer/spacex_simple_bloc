@@ -24,33 +24,19 @@ class UpcomingBloc {
 
   bool isLoading = false;
 
-  bool fullPage = false;
+  bool fullPage;
 
   int _index = 0;
 
   UpcomingBloc() {
+
+    fullPage = false;
 
     // stream untuk upcoming (default)
     _getData(_index);
 
     isLoadingContoller.stream.listen((onData) {
       isLoading = onData;
-    });
-
-    modeType.stream.listen((modeType) {
-      /*
-      ketika user berpindah dari current page maka 
-      pada method getdata akan mengcheck index dan memanggil network call
-      */
-      if (ModeType.allLaunch == modeType) {
-        _index = 1;
-        fullPage = false;
-        _getData(_index);
-      } else {
-        _index = 0;
-        fullPage = false;
-        _getData(_index);
-      }
     });
   }
 
@@ -72,9 +58,9 @@ class UpcomingBloc {
   getInfinite(int index) async {
 
     if (_index == 0) {
+      
       SpaceXLaunchList spaceXLaunchList = await _services.getRestUpcoming(index);
-      if (spaceXLaunchList.listData.length != 0 && _services.indexData != index) {
-        _services.setOffset(index);
+      if (spaceXLaunchList.listData.length != 0) {
         hashMap[1].addAll(spaceXLaunchList.listData);
         datarocket = hashMap[1];
         _controllUnmodief.add(UnmodifiableListView(datarocket));
@@ -84,6 +70,7 @@ class UpcomingBloc {
       }
     }
     isLoadingContoller.sink.add(false);
+    print('object');
   }
 
   /*

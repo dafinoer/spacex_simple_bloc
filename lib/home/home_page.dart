@@ -66,6 +66,7 @@ class HomeSpaceState extends State<HomePage> {
               }
               setState(() {
                 _index = index;
+                bloc.fullPage = false;
               });
             }
         )

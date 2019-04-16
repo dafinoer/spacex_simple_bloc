@@ -20,6 +20,8 @@ class _HomeListState extends State<HomeListNew> {
 
   ScrollController _controller;
 
+  int _page;
+
   @override
   void initState() {
     super.initState();
@@ -28,10 +30,24 @@ class _HomeListState extends State<HomeListNew> {
 
   void _scrollController(){
     if (_controller.offset >= _controller.position.maxScrollExtent){
+        /*
         if (widget.bloc.fullPage == false){
+           setState(() {
+             widget.bloc.isLoadingContoller.add(true);  
+           });
+           widget.bloc.getInfinite(index)
+        } else {
+          debugPrint('full page true');
+        }
+        */
+
+        if (widget.bloc.isLoading == false){
           setState(() {
-            widget.bloc.isLoadingContoller.add(true);  
+          widget.bloc.isLoadingContoller.add(true);  
           });
+          
+          widget.bloc.getInfinite(widget.bloc.datarocket.length);
+          print(widget.bloc.datarocket.length);
         }
     }
   }
@@ -44,7 +60,6 @@ class _HomeListState extends State<HomeListNew> {
     return StreamBuilder(
       stream: bloc.fetchDataRest,
       builder: (_, snapshot){
-
         if (snapshot.hasData){
           return _buildList(snapshot, bloc);
         } else if (snapshot.hasError){
@@ -69,9 +84,9 @@ class _HomeListState extends State<HomeListNew> {
       itemBuilder: (context, index) {
 
         final i = index + 1;
+
         if (i >= snapshot.data.length && bloc.isLoading == true){
-          widget.bloc.getInfinite(i);
-          return LinearProgressIndicator();
+            return Center(child: CircularProgressIndicator());
         }
 
         return ListTile(

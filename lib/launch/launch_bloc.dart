@@ -23,7 +23,7 @@ class LunchBloc {
 
   Future<List<SpaceXLaunch>> fetchLaunch() async{
     if (!hash.containsKey('all')){
-      SpaceXLaunchList launchList = await _launchService.getRestLaunch(0);
+      SpaceXLaunchList launchList = await _launchService.getRestLaunch();
       hash['all'] = launchList.listData;
     }
     _controller.add(UnmodifiableListView(hash['all'].map((f)=> f)));

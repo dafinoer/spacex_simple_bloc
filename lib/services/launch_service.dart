@@ -9,10 +9,10 @@ class LaunchService with Constanta implements Query {
   int _offset;
 
   
-  Future<SpaceXLaunchList> getRestLaunch(int offset) async {
+  Future<SpaceXLaunchList> getRestLaunch() async {
     final uri = Uri.https(Constanta.URL, Constanta.LAUNCH,
         {
-          'offset':offset.toString(),
+          'offset':_offset.toString(),
           'limit':'9'
         }
      );
