@@ -2,9 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:space_x_new/home/home_bloc.dart';
 import 'package:space_x_new/home/home_list.dart';
 import 'package:space_x_new/home/home_provider.dart';
-import 'package:space_x_new/launch/lunch_list.dart';
 import 'package:space_x_new/launch/launch_bloc.dart';
-
+import 'package:space_x_new/launch/lunch_list.dart';
 
 class HomePage extends StatefulWidget {
 
@@ -17,7 +16,7 @@ class HomePage extends StatefulWidget {
 }
 
 class HomeSpaceState extends State<HomePage> {
-  int _index = 0;
+  int _index =0;
 
   final PageStorageKey keyOne = PageStorageKey('pageOne');
   final PageStorageKey keyTwo = PageStorageKey('pageTwo');
@@ -26,6 +25,11 @@ class HomeSpaceState extends State<HomePage> {
 
   PageStorageBucket bucket = PageStorageBucket();
 
+  @override
+  void initState() {
+    // TODO: implement initState
+    super.initState();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -44,18 +48,20 @@ class HomeSpaceState extends State<HomePage> {
               onPressed: (){},
             ),
           ],
+            elevation: 1.0,
         ),
         body: widgetcollection[_index],
         bottomNavigationBar: BottomNavigationBar(
-            items: <BottomNavigationBarItem>[
-              const BottomNavigationBarItem(
-                icon: Icon(Icons.home), 
+          selectedItemColor: Color(0xfff9aa33),
+            items: const <BottomNavigationBarItem>[
+              BottomNavigationBarItem(
+                icon: Icon(Icons.home),
                 title: Text('home')
                 ),
-              const BottomNavigationBarItem(
+              BottomNavigationBarItem(
                 icon: Icon(Icons.new_releases),
-                title: Text('upcoming')
-                )
+                title: Text('all')
+                ),
             ],
             currentIndex: _index,
             onTap: (index){

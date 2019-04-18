@@ -1,8 +1,10 @@
+import 'dart:async';
+import 'dart:collection';
+
 import 'package:rxdart/rxdart.dart';
 import 'package:space_x_new/items/spacex_launch.dart';
 import 'package:space_x_new/services/upcoming_service.dart';
-import 'dart:async';
-import 'dart:collection';
+
 
 // konstan variable
 enum ModeType { upcomingLaunch, allLaunch }
@@ -33,7 +35,7 @@ class UpcomingBloc {
     fullPage = false;
 
     // stream untuk upcoming (default)
-    _getData(_index);
+    getData(_index);
 
     isLoadingContoller.stream.listen((onData) {
       isLoading = onData;
@@ -47,7 +49,7 @@ class UpcomingBloc {
   Observable<UnmodifiableListView<SpaceXLaunch>> get fetchDataRest =>
       _controllUnmodief.stream;
 
-  _getData(int index) {
+  getData(int index) {
     if (index == 0) {
       fetchDataRestUpcoming().then((onValue) {
         _controllUnmodief.add(UnmodifiableListView(datarocket));
@@ -70,7 +72,6 @@ class UpcomingBloc {
       }
     }
     isLoadingContoller.sink.add(false);
-    print('object');
   }
 
   /*

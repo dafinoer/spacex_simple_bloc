@@ -1,8 +1,10 @@
-abstract class Query {
+import 'package:space_x_new/items/launch.dart';
 
-  void setOffset(int offset){
-  }
 
-  void setLimit(int offset){
-  }
+abstract class ListSpaceX {
+
+  Future<List<Launch>> fetchLaunch(int index) {}
+
+  void dispose(){}
+
 }
