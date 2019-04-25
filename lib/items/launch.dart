@@ -1,6 +1,7 @@
 import 'package:space_x_new/items/links.dart';
 import 'package:space_x_new/items/lunch_site.dart';
 import 'package:space_x_new/items/spacex_launch.dart';
+import 'package:space_x_new/items/rockets.dart';
 
 class Launch extends SpaceXLaunch {
 
@@ -12,9 +13,18 @@ class Launch extends SpaceXLaunch {
     int dateUnix,
     String dateUtc,
     String dateLocal,
+    String detail,
+    Rockets rocket,
     this.links,
     this.lunchSite
-  }):super(missionName:mission, dateUnix:dateUnix, dateUtc:dateUtc, dateLocal:dateLocal);
+  }):super(
+    missionName:mission, 
+    dateUnix:dateUnix, 
+    dateUtc:dateUtc, 
+    dateLocal:dateLocal,
+    detail:detail,
+    rockets: rocket
+  );
 
 
   factory Launch.fromJson(Map<String, dynamic> json){
@@ -24,7 +34,9 @@ class Launch extends SpaceXLaunch {
       dateLocal: json['launch_date_local'],
       dateUtc: json['launch_date_utc'],
       lunchSite: LunchSite.fromJson(json['launch_site']),
-      links: Links.fromJson(json['links'])
+      links: Links.fromJson(json['links']),
+      detail: json['details'],
+      rocket: Rockets.fromJson(json['rocket'])
     );
   }
 

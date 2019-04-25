@@ -1,7 +1,7 @@
-import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:space_x_new/items/launch.dart';
 import 'package:space_x_new/launch/launch_bloc.dart';
+import 'package:transparent_image/transparent_image.dart';
 
 class LunchList extends StatefulWidget {
   LunchList({PageStorageKey key, this.bloc}) : super(key: key);
@@ -98,10 +98,8 @@ class _LunchState extends State<LunchList> {
               key: ValueKey(snapshot.data[index].flightNumber),
               leading: imagePacth != null
                   ? CircleAvatar(
-                      child: CachedNetworkImage(
-                          imageUrl: imagePacth,
-                        placeholder: (_, url)=> CircularProgressIndicator(),
-                        errorWidget: (_, url, error)=> Icon(Icons.error),
+                      child: FadeInImage.memoryNetwork(
+                          placeholder: kTransparentImage, image: imagePacth
                       ),
                       backgroundColor: Colors.black87,
                     )
@@ -110,10 +108,13 @@ class _LunchState extends State<LunchList> {
                       backgroundColor: Colors.black12,
                     ),
               title: Text(snapshot.data[index].missionName),
+              onTap: () => Navigator.pushNamed(context, 
+                '/launch/detail', arguments: snapshot.data[index]),
             );
           },
         );
   }
+
 
   Widget _buildCircullarLeading(
       AsyncSnapshot<List<Launch>> snapshot, ImageProvider image) {

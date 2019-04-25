@@ -9,6 +9,7 @@ class SpaceXLaunch {
   final String dateUtc;
   final String dateLocal;
   final String staticFire;
+  final String detail;
 
   SpaceXLaunch({
     this.missionName,
@@ -17,7 +18,8 @@ class SpaceXLaunch {
     this.rockets,
     this.dateUtc,
     this.dateLocal,
-    this.staticFire
+    this.staticFire,
+    this.detail
   });
 
   factory SpaceXLaunch.fromJson(Map<String, dynamic> json){
@@ -29,7 +31,8 @@ class SpaceXLaunch {
       rockets: Rockets.fromJson(json['rocket']),
       dateUtc: json['launch_date_utc'],
       dateLocal: json['launch_date_local'],
-      staticFire: json['static_fire_date_utc']
+      staticFire: json['static_fire_date_utc'],
+      detail: json['details']
     );
   }
 }

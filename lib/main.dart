@@ -3,13 +3,15 @@ import 'package:space_x_new/detail/detail.dart';
 import 'package:space_x_new/home/home_bloc.dart';
 import 'package:space_x_new/home/home_page.dart';
 import 'package:space_x_new/home/home_provider.dart';
+import 'package:flutter/rendering.dart';
+import 'package:space_x_new/launch/detail.dart';
 
 void main() {
+  //debugPaintSizeEnabled = true;
   runApp(MyApp());
 }
 
 class MyApp extends StatelessWidget {
-
   static const primaryColor = Color(0xFF344945);
 
   @override
@@ -18,14 +20,15 @@ class MyApp extends StatelessWidget {
 
     return MaterialApp(
       theme: ThemeData(
-          primaryColor: Colors.white,
+          primaryColor: primaryColor,
           scaffoldBackgroundColor: Colors.white,
           canvasColor: primaryColor,
-        textTheme: Theme.of(context).textTheme.copyWith(caption: TextStyle(color: Colors.white))
-      ),
+          ),
       title: 'FspaceX',
       initialRoute: '/',
       onGenerateRoute: (settings) {
+        final arguments = settings.arguments;
+
         switch (settings.name) {
           case '/':
             return MaterialPageRoute(
@@ -35,10 +38,12 @@ class MyApp extends StatelessWidget {
                   ),
             );
           case '/home/detail':
-            final arguments = settings.arguments;
-
             return MaterialPageRoute(
                 builder: (_) => DetailPage(spaceXLaunch: arguments));
+
+          case '/launch/detail':
+            return MaterialPageRoute(
+              builder: (_) => DetailLauch(launch: arguments,));
         }
       },
     );
