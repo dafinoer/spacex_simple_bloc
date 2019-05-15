@@ -7,7 +7,6 @@ import 'package:intl/intl.dart';
 
 class LaunchService with Constanta {
 
-  
   Future<List<Launch>> getRestLaunch(int index, String end) async {
     final uri = Uri.https(Constanta.URL, Constanta.LAUNCH,
         {

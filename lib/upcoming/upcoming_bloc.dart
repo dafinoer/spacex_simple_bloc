@@ -4,6 +4,7 @@ import 'dart:collection';
 import 'package:rxdart/rxdart.dart';
 import 'package:space_x_new/items/spacex_launch.dart';
 import 'package:space_x_new/services/upcoming_service.dart';
+import 'package:http/http.dart' as http;
 
 
 // konstan variable
@@ -14,7 +15,7 @@ class UpcomingBloc {
   final UpcomingServices _services = UpcomingServices();
 
   final _controllUnmodief =
-      BehaviorSubject<UnmodifiableListView<SpaceXLaunch>>();
+      BehaviorSubject<List<SpaceXLaunch>>();
 
   var datarocket = <SpaceXLaunch>[];
 
@@ -34,7 +35,6 @@ class UpcomingBloc {
 
     fullPage = false;
 
-    // stream untuk upcoming (default)
     getData(_index);
 
     isLoadingContoller.stream.listen((onData) {
@@ -47,49 +47,50 @@ class UpcomingBloc {
   Sink<bool> get modeIsLoading => isLoadingContoller.sink;
 
   Observable<UnmodifiableListView<SpaceXLaunch>> get fetchDataRest =>
-      _controllUnmodief.stream;
+      _controllUnmodief.stream.transform(_transformData());
+
+  _transformData(){
+    StreamTransformer<List<SpaceXLaunch>, UnmodifiableListView<SpaceXLaunch>> transformer;
+
+    transformer = StreamTransformer.fromHandlers(handleData: (data, EventSink sink){
+      sink.add(UnmodifiableListView(data.where((x)=> x.dateLocal != null )));
+    });
+    return transformer;
+  }
 
   getData(int index) {
-    if (index == 0) {
-      fetchDataRestUpcoming().then((onValue) {
-        _controllUnmodief.add(UnmodifiableListView(datarocket));
-      });
-    }
+    fetchDataRestUpcoming().then((onValue) {
+      _controllUnmodief.add(UnmodifiableListView(onValue));
+    });
   }
+
   // for infinte list
   getInfinite(int index) async {
+    _services.setQuery({'offset':index.toString(), 'limit':'10'});
 
-    if (_index == 0) {
-      
-      SpaceXLaunchList spaceXLaunchList = await _services.getRestUpcoming(index);
+      SpaceXLaunchList spaceXLaunchList = await _services.fetchRest(http.Client());
+
       if (spaceXLaunchList.listData.length != 0) {
         hashMap[1].addAll(spaceXLaunchList.listData);
-        datarocket = hashMap[1];
-        _controllUnmodief.add(UnmodifiableListView(datarocket));
+        _controllUnmodief.add(hashMap[1]);
       } else {
         fullPage = true;
-        _controllUnmodief.add(UnmodifiableListView(datarocket));   
+        _controllUnmodief.add(hashMap[1]);
       }
-    }
+
     isLoadingContoller.sink.add(false);
   }
 
-  /*
-    konsep key dan value ini akan check key, di sini ketika key 1 ada maka
-    lanjut akan langsung di initilize ke variable datarocket
-    kemudian di return hashmapnya 
-     */
   Future<List<SpaceXLaunch>> fetchDataRestUpcoming() async {
-    if (!hashMap.containsKey(1)) {
-      SpaceXLaunchList launchRest = await _services.getRestUpcoming(0);
-      hashMap[1] = launchRest.listData;
-    }
-    datarocket = hashMap[1];
+    _services.setQuery({'offset':'0', 'limit':'10'});
+    SpaceXLaunchList launchRest = await _services.fetchRest(http.Client());
+    hashMap[1] = launchRest.listData;
 
     return hashMap[1];
   }
 
   void dispose() {
     _controllUnmodief.close();
+    isLoadingContoller.close();
   }
 }

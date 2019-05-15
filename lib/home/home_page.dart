@@ -1,12 +1,21 @@
 import 'package:flutter/material.dart';
-import 'package:space_x_new/home/home_bloc.dart';
-import 'package:space_x_new/home/home_list.dart';
-import 'package:space_x_new/home/home_provider.dart';
+
+import 'package:space_x_new/latest/latest_page.dart';
+import 'package:space_x_new/upcoming/upcoming_bloc.dart';
+import 'package:space_x_new/upcoming/upcoming_page.dart';
 import 'package:space_x_new/launch/launch_bloc.dart';
 import 'package:space_x_new/launch/lunch_list.dart';
+import 'package:space_x_new/latest/latest_bloc.dart';
+import 'package:space_x_new/home/homebloc.dart';
+import 'package:space_x_new/home/home_provider.dart';
+
+import 'package:space_x_new/settings/pref_provider.dart';
 
 class HomePage extends StatefulWidget {
+  final LatestBloc blocLatest = LatestBloc();
+  final UpcomingBloc bloc = UpcomingBloc();
   final LunchBloc blocLaunch = LunchBloc();
+  final HomeBloc blocHome = HomeBloc();
 
   @override
   State<StatefulWidget> createState() {
@@ -24,63 +33,81 @@ class HomeSpaceState extends State<HomePage> {
 
   PageStorageBucket bucket = PageStorageBucket();
 
-  @override
-  void initState() {
-    // TODO: implement initState
-    super.initState();
-  }
+  bool modeTheme;
 
   @override
-  Widget build(BuildContext context) {
-    final bloc = UpcomingProvider.of(context);
+  void initState() {
+    super.initState();
     widgetcollection = [
-      HomeListNew(
-        bloc: bloc,
-        key: keyOne,
+
+      HomeProvider(
+        bloc: widget.blocHome,
+        child: LatestPage(
+          lates: widget.blocLatest,
+        ),
       ),
+
+      HomeListNew(
+          bloc: widget.bloc,
+          key: keyOne,
+      ),
+      
       LunchList(
         bloc: widget.blocLaunch,
         key: keyTwo,
       )
     ];
+  }
 
-    return Scaffold(
-        appBar: AppBar(
-          title: const Text('FspaceX'),
-          actions: <Widget>[
-            IconButton(
-              icon: Icon(Icons.search),
-              onPressed: () {},
-            ),
-          ],
-          elevation: 1.0,
-        ),
-        body: widgetcollection[_index],
-        bottomNavigationBar: BottomNavigationBar(
-            selectedItemColor: Color(0xfff9aa33),
-            showUnselectedLabels: true,
-            unselectedItemColor: Colors.white,
-            items: const <BottomNavigationBarItem>[
-              BottomNavigationBarItem(
-                icon: Icon(Icons.home),
-                title: Text('home'),
-              ),
-              BottomNavigationBarItem(
-                  icon: Icon(Icons.new_releases), title: Text('all')),
-              BottomNavigationBarItem(
-                  icon: Icon(Icons.directions_car), title: Text('vehicle')),
-            ],
-            currentIndex: _index,
-            onTap: (index) {
-              if (index == 0) {
-                bloc.modeType.add(ModeType.upcomingLaunch);
-              } else {
-                bloc.modeType.add(ModeType.allLaunch);
-              }
-              setState(() {
-                _index = index;
-                bloc.fullPage = false;
-              });
-            }));
+  @override
+  Widget build(BuildContext context) {
+    final prefBloc = PrefProvider.of(context);
+
+    return StreamBuilder(
+        stream: prefBloc.blocpref.prefObserver,
+        builder: (_, AsyncSnapshot<bool> snapshot) {
+          if (snapshot.hasData) {
+
+            return Theme(
+              data: snapshot.data ? ThemeData(brightness: Brightness.dark) : _defaultTheme(),
+              child: Scaffold(
+                    body: widgetcollection[_index],
+                    bottomNavigationBar: BottomNavigationBar(
+                        selectedItemColor: const Color(0xfff9aa33),
+                        showUnselectedLabels: true,
+                        elevation: 2.0,
+                        unselectedItemColor: Colors.white,
+                        items: <BottomNavigationBarItem>[
+                          BottomNavigationBarItem(
+                              icon: Icon(Icons.alarm),
+                              title: const Text('latest')),
+                          BottomNavigationBarItem(
+                            icon: Icon(Icons.home),
+                            title: const Text('upcoming'),
+                          ),
+                          BottomNavigationBarItem(
+                              icon: Icon(Icons.new_releases),
+                              title: const Text('all')),
+                        ],
+                        currentIndex: _index,
+                        onTap: (index) {
+                          setState(() {
+                            _index = index;
+                            widget.bloc.fullPage = false;
+                          });
+                        })),);
+          } else {
+            return Container();
+          }
+        });
+  }
+
+  ThemeData _defaultTheme() {
+    const primaryColor = Color(0xFF344945);
+    return ThemeData(
+      primaryColor: primaryColor,
+      scaffoldBackgroundColor: Colors.white,
+      canvasColor: primaryColor,
+    );
   }
 }

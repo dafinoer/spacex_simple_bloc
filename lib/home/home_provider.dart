@@ -1,24 +1,23 @@
 import 'package:flutter/material.dart';
-import 'package:space_x_new/home/home_bloc.dart';
+import 'package:space_x_new/home/homebloc.dart';
 
-class UpcomingProvider extends InheritedWidget {
-
-  final UpcomingBloc upcomingBloc;
-
-  UpcomingProvider({
+class HomeProvider extends InheritedWidget {
+  HomeProvider({
     Key key,
     Widget child,
-    this.upcomingBloc
-  }) : super(key:key, child:child);
+    this.bloc,
+  })  : assert(bloc != null),
+        assert(child != null),
+        super(key: key, child: child);
+
+  final HomeBloc bloc;
 
   @override
-  bool updateShouldNotify(InheritedWidget oldWidget) {
-    return true;
+  bool updateShouldNotify(HomeProvider oldWidget) {
+    return bloc != oldWidget.bloc;
   }
 
-  static UpcomingBloc of(BuildContext context){
-    return (context.inheritFromWidgetOfExactType(UpcomingProvider) as UpcomingProvider).upcomingBloc;
+  static HomeProvider of(BuildContext context){
+    return context.inheritFromWidgetOfExactType(HomeProvider) as HomeProvider;
   }
-  
 }
-

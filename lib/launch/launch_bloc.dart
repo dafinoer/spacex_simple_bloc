@@ -8,10 +8,8 @@ import 'package:space_x_new/utils/utils.dart';
 import 'package:intl/date_symbol_data_local.dart';
 import 'package:intl/intl.dart';
 
-
-class LunchBloc implements ListSpaceX{
-  
-  final _controller = BehaviorSubject<UnmodifiableListView<Launch>>();
+class LunchBloc {
+  final _controller = BehaviorSubject<List<Launch>>();
 
   final loadMore = StreamController<bool>();
 
@@ -23,47 +21,57 @@ class LunchBloc implements ListSpaceX{
 
   final _dateFormat = DateFormat('yyyy-MM-dd');
 
-  HashMap<String, List<Launch>> _hashCache = HashMap();
+  final HashMap<String, List<Launch>> _hashCache = HashMap();
 
-  var dataRocketHistory = <Launch>[];
+  int get hadRange => _hashCache['all'] != null ? _hashCache['all'].length : 0;
 
-  LunchBloc(){
-    getData(dataRocketHistory.length);
-    loadMore.stream.listen((value){
+
+  LunchBloc() {
+    getData(hadRange ?? 0);
+
+    loadMore.stream.listen((value) {
       loadingStatus = value;
     });
   }
 
-  Observable<UnmodifiableListView<Launch>> get fetchstream => _controller.stream;
+  Observable<UnmodifiableListView<Launch>> get fetchstream =>
+      _controller.stream.transform(_transformData());
+
+  _transformData() {
+    return StreamTransformer<List<Launch>,
+        UnmodifiableListView<Launch>>.fromHandlers(handleData: handlerData);
+  }
+
+  void handlerData(List<Launch> data, EventSink sink) {
+    sink.add(UnmodifiableListView(data.where((launch) => launch.rockets.core.length != 0)));
+  }
 
   void getData(int index) async {
-    fetchLaunch(index).then((onvalue){
-      _controller.  add(UnmodifiableListView(dataRocketHistory));
+    fetchLaunch(index).then((onvalue) {
+      _controller.add(onvalue);
       loadMore.sink.add(false);
     });
   }
 
   @override
   Future<List<Launch>> fetchLaunch(int index) async {
-
-
-    if (!_hashCache.containsKey('all')){
-      List<Launch> launchList = await _service.getRestLaunch(0, _dateFormat.format(_timeEndquery));
+    if (!_hashCache.containsKey('all')) {
+      List<Launch> launchList =
+          await _service.getRestLaunch(0, _dateFormat.format(_timeEndquery));
       _hashCache['all'] = launchList;
-    } else if (dataRocketHistory.length != 0){
-      List<Launch> launchList = await _service.getRestLaunch(index, _dateFormat.format(_timeEndquery));
+    } else if (hadRange != 0) {
+      List<Launch> launchList = await _service.getRestLaunch(
+          index, _dateFormat.format(_timeEndquery));
       if (launchList.length != 0) {
         _hashCache['all'].addAll(launchList.map((f) => f));
       }
     }
-    dataRocketHistory = _hashCache['all'];
 
-    return dataRocketHistory;
+    return _hashCache['all'];
   }
 
   @override
-  void dispose(){
+  void dispose() {
     _controller.close();
   }
-
 }

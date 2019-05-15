@@ -2,7 +2,16 @@
 
 SpaceX upcoming launch apps. 
 
+
 ![](https://media.giphy.com/media/kcNnRXrILePiCLaBaM/giphy.gif)
+
+
+![settings](https://media.giphy.com/media/H35lVhzB8wOHIsp7oG/giphy.gif)
+![upcoming](https://media.giphy.com/media/QUKw3U3fg1VAYnTEhK/giphy.gif)
+![latest](https://media.giphy.com/media/VgB3FTTvyAStKHHLzJ/giphy.gif)
+![menu](https://media.giphy.com/media/YNypCoifxzjHd0xYMO/giphy.gif)
+![search](https://media.giphy.com/media/RfSywMgPqlB5WggnRR/giphy.gif)
+
 
 
 ## Getting Started

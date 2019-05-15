@@ -22,7 +22,6 @@ class _LunchState extends State<LunchList> {
 
   @override
   void initState() {
-    // TODO: implement initState
     super.initState();
     _scrollController = ScrollController()..addListener(scrollControl);
     _imageSpaceXLogo = Image.asset(
@@ -35,11 +34,10 @@ class _LunchState extends State<LunchList> {
   void scrollControl() {
     if (_scrollController.offset >=
         _scrollController.position.maxScrollExtent) {
-
-      if (widget.bloc.loadingStatus == false){
+      if (widget.bloc.loadingStatus == false) {
         setState(() {});
         widget.bloc.loadMore.add(true);
-        widget.bloc.getData(widget.bloc.dataRocketHistory.length);
+        widget.bloc.getData(widget.bloc.hadRange);
       }
     }
   }
@@ -52,69 +50,80 @@ class _LunchState extends State<LunchList> {
 
   @override
   void dispose() {
-    // TODO: implement dispose
     super.dispose();
     _scrollController.dispose();
-    widget.bloc.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
-    return StreamBuilder(
-      stream: widget.bloc.fetchstream,
-      builder: (_, snapshot) {
-        if (snapshot.hasData) {
-          return _buildList(snapshot);
-        } else if (snapshot.hasError) {
-          print('${snapshot.error}');
-        } else if (widget.bloc.dataRocketHistory.length > 0) {
-          return Container();
+    return Scaffold(
+        appBar: AppBar(
+          title: const Text('FX'),
+          actions: <Widget>[
+            IconButton(icon: Icon(Icons.search), onPressed: ()=>print('testing'))
+          ],
+        ),
+        body: StreamBuilder(
+          stream: widget.bloc.fetchstream,
+          builder: (_, snapshot) {
+            print('launch');
+            if (snapshot.hasData) {
+              return _buildList(snapshot, context);
+            } else if (snapshot.hasError) {
+              print('${snapshot.error}');
+            } else if (widget.bloc.hadRange > 0) {
+              return Container();
+            }
+            return Center(
+              child: CircularProgressIndicator(),
+            );
+          },
+        ));
+  }
+
+  Widget _buildList(
+      AsyncSnapshot<List<Launch>> snapshot, BuildContext context) {
+    return ListView.separated(
+      key: widget.key,
+      controller: _scrollController,
+      padding: const EdgeInsets.symmetric(vertical: 12.0),
+      separatorBuilder: (_, index) => Divider(),
+      itemCount: snapshot.data.length,
+      itemBuilder: (_, index) {
+        var imagePacth = snapshot.data[index].links.mission_patch_small;
+
+        final indexList = index + 1;
+
+        if (indexList >= snapshot.data.length &&
+            widget.bloc.loadingStatus == true) {
+          print('loadmore');
+          return LinearProgressIndicator(
+            backgroundColor: Colors.orange,
+          );
         }
-        return Center(
-          child: CircularProgressIndicator(),
+
+        return ListTile(
+          key: ValueKey(snapshot.data[index].flightNumber),
+          leading: imagePacth != null
+              ? CircleAvatar(
+                  child: FadeInImage.memoryNetwork(
+                      placeholder: kTransparentImage, image: imagePacth),
+                  backgroundColor: Colors.black87,
+                )
+              : CircleAvatar(
+                  backgroundImage: _imageSpaceXLogo.image,
+                  backgroundColor: Colors.black12,
+                ),
+          title: Text(
+            snapshot.data[index].missionName,
+            style: Theme.of(context).textTheme.title,
+          ),
+          onTap: () => Navigator.pushNamed(context, '/launch/detail',
+              arguments: snapshot.data[index]),
         );
       },
     );
   }
-
-  Widget _buildList(AsyncSnapshot<List<Launch>> snapshot) {
-    return ListView.separated(
-          key: widget.key,
-          controller: _scrollController,
-          padding: const EdgeInsets.symmetric(vertical: 12.0),
-          separatorBuilder: (_, index) => Divider(),
-          itemCount: snapshot.data.length,
-          itemBuilder: (_, index) {
-
-            var imagePacth = snapshot.data[index].links.mission_patch_small;
-
-            final indexList = index + 1 ;
-
-            if (indexList >= snapshot.data.length && widget.bloc.loadingStatus == true){
-              return LinearProgressIndicator(backgroundColor: Colors.orange,);
-            }
-
-            return ListTile(
-              key: ValueKey(snapshot.data[index].flightNumber),
-              leading: imagePacth != null
-                  ? CircleAvatar(
-                      child: FadeInImage.memoryNetwork(
-                          placeholder: kTransparentImage, image: imagePacth
-                      ),
-                      backgroundColor: Colors.black87,
-                    )
-                  : CircleAvatar(
-                      backgroundImage: _imageSpaceXLogo.image,
-                      backgroundColor: Colors.black12,
-                    ),
-              title: Text(snapshot.data[index].missionName),
-              onTap: () => Navigator.pushNamed(context, 
-                '/launch/detail', arguments: snapshot.data[index]),
-            );
-          },
-        );
-  }
-
 
   Widget _buildCircullarLeading(
       AsyncSnapshot<List<Launch>> snapshot, ImageProvider image) {

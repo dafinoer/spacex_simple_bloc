@@ -40,6 +40,7 @@ class SpaceXLaunch {
 class SpaceXLaunchList {
 
   final List<SpaceXLaunch> listData;
+  
   SpaceXLaunchList({this.listData});
 
   factory SpaceXLaunchList.fromJson(List<dynamic> json){

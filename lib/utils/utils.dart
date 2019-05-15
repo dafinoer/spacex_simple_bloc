@@ -1,10 +1,6 @@
-import 'package:space_x_new/items/launch.dart';
+import 'package:http/http.dart' as http;
 
+abstract class Service {
 
-abstract class ListSpaceX {
-
-  Future<List<Launch>> fetchLaunch(int index) {}
-
-  void dispose(){}
-
+  Future<dynamic> fetchRest(http.Client client);
 }
